@@ -174,6 +174,9 @@ class ImageFolderMaskDataset(Dataset):
         self.mask_path = os.path.join(path, "masks")
         self.normal_path = os.path.join(path, "normal")
 
+        self._all_fnames = os.listdir(self.normal_path)
+
+
         self.mask_paths = [os.path.join(self.mask_path, nodule_path) for nodule_path in os.listdir(self.mask_path)]
         self.normal_paths = [os.path.join(self.normal_path, nodule_path) for nodule_path in os.listdir(self.normal_path)]
 

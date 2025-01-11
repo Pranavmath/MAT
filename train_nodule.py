@@ -16,6 +16,8 @@ import json
 import tempfile
 import torch
 import dnnlib
+import sys
+from io import StringIO
 
 from training import training_loop
 # from training import training_loop_simmim as training_loop
@@ -220,9 +222,11 @@ def setup_training_loop_kwargs(
     # New change
 
     # channels = 1
-    args.G_kwargs = dnnlib.EasyDict(img_channels=1, class_name=generator, z_dim=zdim, w_dim=wdim, mapping_kwargs=dnnlib.EasyDict(), synthesis_kwargs=dnnlib.EasyDict())
-    args.D_kwargs = dnnlib.EasyDict(img_channels=1, class_name=discriminator)
+    args.G_kwargs = dnnlib.EasyDict(class_name=generator, z_dim=zdim, w_dim=wdim, mapping_kwargs=dnnlib.EasyDict(), synthesis_kwargs=dnnlib.EasyDict())
+    args.D_kwargs = dnnlib.EasyDict(class_name=discriminator)
 
+    #args.G_kwargs.img_channels = 1
+    #args.D_kwargs.img_channels = 1
 
     # ------------------
 

@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
 #
 # NVIDIA CORPORATION and its licensors retain all intellectual property
 # and proprietary rights in and to this software, related documentation
@@ -148,10 +148,16 @@ def training_loop(
     # Construct networks.
     if rank == 0:
         print('Constructing networks...')
+    
+    #print(training_set.num_channels)
+    #print(training_set.resolution)
+    
     common_kwargs = dict(c_dim=training_set.label_dim, img_resolution=training_set.resolution, img_channels=training_set.num_channels)
     G = dnnlib.util.construct_class_by_name(**G_kwargs, **common_kwargs).train().requires_grad_(False).to(device) # subclass of torch.nn.Module
     D = dnnlib.util.construct_class_by_name(**D_kwargs, **common_kwargs).train().requires_grad_(False).to(device) # subclass of torch.nn.Module
     G_ema = copy.deepcopy(G).eval()
+
+    #print(resume_pkl)
 
     # Resume from existing pickle.
     if (resume_pkl is not None) and (rank == 0):
@@ -163,6 +169,9 @@ def training_loop(
 
     # Print network summary tables.
     if rank == 0:
+        #print(G.z_dim)
+        #print(G.c_dim)
+
         z = torch.empty([batch_gpu, G.z_dim], device=device)
         c = torch.empty([batch_gpu, G.c_dim], device=device)
         # adaptation to inpainting config
@@ -171,7 +180,12 @@ def training_loop(
         mask_in = torch.empty([batch_gpu, 1, training_set.resolution, training_set.resolution], device=device)
         img = misc.print_module_summary(G, [img_in, mask_in, z, c])
         # D
-        img_stg1 = torch.empty([batch_gpu, 3, training_set.resolution, training_set.resolution], device=device)
+
+        # -----------------------------------------
+        # -----------------------------------------
+        # -----------------------------------------
+        # changing 3 to 1
+        img_stg1 = torch.empty([batch_gpu, 1, training_set.resolution, training_set.resolution], device=device)
         misc.print_module_summary(D, [img, mask_in, img_stg1, c])
 
     # Setup augmentation.
@@ -298,6 +312,9 @@ def training_loop(
         with torch.autograd.profiler.record_function('data_fetch'):
             phase_real_img, phase_mask, phase_real_c = next(training_set_iterator)
             phase_real_img = (phase_real_img.to(device).to(torch.float32) / 127.5 - 1).split(batch_gpu)
+            
+            #print(phase_real_img.shape, phase_mask.shape)
+            
             # adaptation to inpainting config
             phase_mask = phase_mask.to(device).to(torch.float32).split(batch_gpu)
             # --------------------

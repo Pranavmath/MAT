@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
 #
 # NVIDIA CORPORATION and its licensors retain all intellectual property
 # and proprietary rights in and to this software, related documentation
@@ -182,6 +182,8 @@ class ImageFolderMaskDataset(Dataset):
 
         raw_shape = [len(self.normal_paths)] + list(self._load_raw_image(0).shape)
 
+        #print(raw_shape)
+
         if resolution is not None and (raw_shape[2] != resolution or raw_shape[3] != resolution):
             raise IOError('Image files do not match the specified resolution')
         
@@ -240,7 +242,7 @@ class ImageFolderMaskDataset(Dataset):
         return labels
 
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):        
         image = self._load_raw_image(self._raw_idx[idx])
 
         assert isinstance(image, np.ndarray)
